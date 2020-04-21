@@ -33,6 +33,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.MyViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+        holder.position = position;
         iRecyclerMainPresenter.bindView(holder);
     }
 
@@ -47,12 +48,11 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.MyViewHolder
 
         @BindView(R.id.myphoto)
         ImageView photoView;
-        private int position;
+        private int position = 0;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-            this.position = getAdapterPosition();
         }
 
         @Override

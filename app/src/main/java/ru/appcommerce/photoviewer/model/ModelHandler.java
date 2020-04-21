@@ -5,6 +5,7 @@ import java.util.List;
 
 public class ModelHandler {
     private static ModelHandler instance;
+    private int itemPosition;
     private List<Data> list;
 
     private ModelHandler(){
@@ -24,5 +25,13 @@ public class ModelHandler {
 
     public void setData(int position){
         list.get(position).setCurrentPosition(position);
+    }
+
+    public int getItemPosition() {
+        return itemPosition;
+    }
+
+    public void setItemPosition(int itemPosition) {
+        this.itemPosition = itemPosition;
     }
 }

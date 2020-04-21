@@ -23,6 +23,6 @@ public class DetailActivity extends AppCompatActivity implements IDetailPresente
 
     @Override
     public void showLog(int position) {
-        Log.d("", "Current position: "+position);
+
     }
 }

@@ -21,7 +21,9 @@ public class MainPresenter {
 
         @Override
         public void bindView(final IViewHolder holder) {
-            dataHandler.setData(holder.getPos()+1);
+            dataHandler.setItemPosition(holder.getPos());
+            dataHandler.setData(holder.getPos());
+            
             holder.showMoreListener(listener);
         }
 
