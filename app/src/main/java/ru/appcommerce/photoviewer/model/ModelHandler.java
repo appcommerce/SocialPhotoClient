@@ -3,6 +3,10 @@ package ru.appcommerce.photoviewer.model;
 import java.util.Arrays;
 import java.util.List;
 
+import io.reactivex.Single;
+import io.reactivex.SingleOnSubscribe;
+import io.reactivex.schedulers.Schedulers;
+
 public class ModelHandler {
     private static ModelHandler instance;
     private int itemPosition;
@@ -27,11 +31,13 @@ public class ModelHandler {
         list.get(position).setCurrentPosition(position);
     }
 
-    public int getItemPosition() {
-        return itemPosition;
-    }
-
     public void setItemPosition(int itemPosition) {
         this.itemPosition = itemPosition;
+    }
+
+    public Single<Integer> getItemPosition() {
+        return Single.create((SingleOnSubscribe<Integer>) emitter ->
+                emitter.onSuccess(itemPosition))
+                .subscribeOn(Schedulers.io());
     }
 }
