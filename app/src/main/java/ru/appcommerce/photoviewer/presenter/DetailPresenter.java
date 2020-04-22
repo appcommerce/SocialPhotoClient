@@ -2,9 +2,6 @@ package ru.appcommerce.photoviewer.presenter;
 
 import android.util.Log;
 
-import java.util.List;
-
-import ru.appcommerce.photoviewer.model.Data;
 import ru.appcommerce.photoviewer.model.ModelHandler;
 
 public class DetailPresenter {
@@ -17,7 +14,6 @@ public class DetailPresenter {
 
     public void getModelId(){
         int position = modelHandler.getItemPosition();
-        Log.d("", "Current position: "+position);
-        //iDetailPresenter.showLog(position);
+        Log.d("DetailPresenter", "Current position: "+position);
     }
 }

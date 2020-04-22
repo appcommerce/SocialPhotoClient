@@ -1,18 +1,22 @@
 package ru.appcommerce.photoviewer.presenter;
 
+import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 
 import java.util.List;
 
 import ru.appcommerce.photoviewer.model.Data;
 import ru.appcommerce.photoviewer.model.ModelHandler;
+import ru.appcommerce.photoviewer.view.DetailActivity;
 import ru.appcommerce.photoviewer.view.IViewHolder;
 
 
 public class MainPresenter {
 
     private RecyclerMainPresenter recyclerMainPresenter = new RecyclerMainPresenter();
-    private View.OnClickListener listener;
+    private Context context;
 
     private class RecyclerMainPresenter implements IRecyclerMainPresenter {
 
@@ -21,10 +25,15 @@ public class MainPresenter {
 
         @Override
         public void bindView(final IViewHolder holder) {
-            dataHandler.setItemPosition(holder.getPos());
-            dataHandler.setData(holder.getPos());
-            
-            holder.showMoreListener(listener);
+            holder.showMoreListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dataHandler.setItemPosition(holder.getPos());
+                    dataHandler.setData(holder.getPos());
+                    final Intent intent = new Intent(context, DetailActivity.class);
+                    context.startActivity(intent);
+                }
+            });
         }
 
         @Override
@@ -33,8 +42,8 @@ public class MainPresenter {
         }
     }
 
-    public void setListener(View.OnClickListener listener){
-        this.listener = listener;
+    public void setContext(Context context) {
+        this.context = context;
     }
 
     public RecyclerMainPresenter getRecyclerMainPresenter() {

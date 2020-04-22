@@ -3,6 +3,7 @@ package ru.appcommerce.photoviewer.view;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +34,6 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.MyViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        holder.position = position;
         iRecyclerMainPresenter.bindView(holder);
     }
 
@@ -48,7 +48,6 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.MyViewHolder
 
         @BindView(R.id.myphoto)
         ImageView photoView;
-        private int position = 0;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -62,7 +61,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.MyViewHolder
 
         @Override
         public int getPos() {
-            return position;
+            return getAdapterPosition();
         }
 
         @Override

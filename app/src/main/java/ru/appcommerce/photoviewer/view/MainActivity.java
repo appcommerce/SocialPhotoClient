@@ -5,9 +5,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -29,14 +27,7 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         presenter = new MainPresenter();
-
-        final Intent intent = new Intent(this, DetailActivity.class);
-        presenter.setListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(intent);
-            }
-        });
+        presenter.setContext(this);
         initRecyclerView();
     }
 
