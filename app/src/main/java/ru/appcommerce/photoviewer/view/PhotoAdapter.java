@@ -3,26 +3,26 @@ package ru.appcommerce.photoviewer.view;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import com.squareup.picasso.Picasso;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.appcommerce.photoviewer.R;
-import ru.appcommerce.photoviewer.presenter.IRecyclerMainPresenter;
+import ru.appcommerce.photoviewer.model.Hit;
 
 
 public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.MyViewHolder> {
+    private List<Hit> content;
+    private IPhotoClickListener photoClickListener;
 
-    private IRecyclerMainPresenter iRecyclerMainPresenter;
-
-
-    public PhotoAdapter(IRecyclerMainPresenter iRecyclerMainPresenter) {
-        this.iRecyclerMainPresenter = iRecyclerMainPresenter;
-
+    public PhotoAdapter(List<Hit> content) {
+        this.content = content;
     }
 
     @NonNull
@@ -34,17 +34,23 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.MyViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        iRecyclerMainPresenter.bindView(holder);
+        Picasso.get().load(content.get(position).getWebFormatUrl()).into(holder.photoView);
+        holder.photoView.setOnClickListener(v -> {
+            //TODO: Тут отправим position и ссылку на картинку в модель для передачи в DetailPresenter
+            photoClickListener.openPhoto();
+        });
     }
 
     @Override
     public int getItemCount() {
-        return iRecyclerMainPresenter.getItemCount();
+        return content.size();
     }
 
+    public void setPhotoClickListener(IPhotoClickListener listener){
+        this.photoClickListener = listener;
+    }
 
-
-    class MyViewHolder extends RecyclerView.ViewHolder implements IViewHolder {
+    static class MyViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.myphoto)
         ImageView photoView;
@@ -54,19 +60,5 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.MyViewHolder
             ButterKnife.bind(this, itemView);
         }
 
-        @Override
-        public void setPhoto(int drawable) {
-            photoView.setImageResource(drawable);
-        }
-
-        @Override
-        public int getPos() {
-            return getAdapterPosition();
-        }
-
-        @Override
-        public void showMoreListener(View.OnClickListener listener) {
-            photoView.setOnClickListener(listener);
-        }
     }
 }

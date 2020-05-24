@@ -1,52 +1,57 @@
 package ru.appcommerce.photoviewer.presenter;
 
-import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
-import android.view.View;
 
-import java.util.List;
+import javax.inject.Inject;
 
-import ru.appcommerce.photoviewer.model.Data;
-import ru.appcommerce.photoviewer.model.ModelHandler;
-import ru.appcommerce.photoviewer.view.DetailActivity;
-import ru.appcommerce.photoviewer.view.IViewHolder;
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
+import moxy.InjectViewState;
+import moxy.MvpPresenter;
+import ru.appcommerce.photoviewer.App;
+import ru.appcommerce.photoviewer.model.PhotoArray;
+import ru.appcommerce.photoviewer.model.network.Network;
+import ru.appcommerce.photoviewer.view.IMainPresenter;
 
 
-public class MainPresenter {
+@InjectViewState
+public class MainPresenter extends MvpPresenter<IMainPresenter> {
+    private static final String TAG = "MainPresenter";
+    @Inject
+    Network network;
 
-    private RecyclerMainPresenter recyclerMainPresenter = new RecyclerMainPresenter();
-    private Context context;
+    private CompositeDisposable subscriptions;
 
-    private class RecyclerMainPresenter implements IRecyclerMainPresenter {
-
-        private ModelHandler dataHandler = ModelHandler.getInstance();
-        private List<Data> list = dataHandler.getData();
-
-        @Override
-        public void bindView(final IViewHolder holder) {
-            holder.showMoreListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    dataHandler.setItemPosition(holder.getPos());
-                    dataHandler.setData(holder.getPos());
-                    final Intent intent = new Intent(context, DetailActivity.class);
-                    context.startActivity(intent);
-                }
-            });
-        }
-
-        @Override
-        public int getItemCount() {
-            return list.size();
-        }
+    public MainPresenter() {
+        App.getComponent().inject(this);
+        this.subscriptions = new CompositeDisposable();
     }
 
-    public void setContext(Context context) {
-        this.context = context;
+    public void fillPhotoList(String query, String orientation, String category){
+        Single<PhotoArray> single = network.getFromServer(prepareQuery(query), orientation, category);
+        subscriptions.add(single.doOnSuccess(photoArray -> Log.d(TAG, "Success"))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        photoArray -> {
+                            getViewState().loadRecycler(photoArray.getHits());
+                        },
+                        throwable -> Log.e(TAG, "onError", throwable)));
     }
 
-    public RecyclerMainPresenter getRecyclerMainPresenter() {
-        return recyclerMainPresenter;
+    //TODO: В следующим коммитом добавлю поддержку добавления картинок в БД, оттуда буду загружать только когда нет интернета
+
+    private String prepareQuery(String query) {
+        return query.replace(" ", "+");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (!subscriptions.isDisposed()) {
+            subscriptions.dispose();
+        }
     }
 }
