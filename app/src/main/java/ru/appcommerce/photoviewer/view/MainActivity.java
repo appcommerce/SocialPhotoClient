@@ -18,7 +18,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import moxy.MvpAppCompatActivity;
 import moxy.presenter.InjectPresenter;
-import ru.appcommerce.photoviewer.App;
 import ru.appcommerce.photoviewer.R;
 import ru.appcommerce.photoviewer.model.Hit;
 import ru.appcommerce.photoviewer.presenter.MainPresenter;
@@ -46,7 +45,7 @@ public class MainActivity extends MvpAppCompatActivity implements IMainPresenter
             if (savedInstanceState == null){
                 if(activeNetwork != null){
                     boolean isLoadFromDB = activeNetwork.isConnectedOrConnecting();
-                    if (!isLoadFromDB) {
+                    if (isLoadFromDB) {
                         presenter.fillPhotoList("marvel", "horizontal", null);
                     } else {
                         presenter.getPhotosFromDB();

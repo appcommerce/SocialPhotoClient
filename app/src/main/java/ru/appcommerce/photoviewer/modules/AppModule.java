@@ -32,4 +32,10 @@ public class AppModule {
     Network provideNetwork(){
         return new Network();
     }
+
+    @Singleton
+    @Provides
+    Context provideContext(){
+        return application;
+    }
 }
