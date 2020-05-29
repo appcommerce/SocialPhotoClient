@@ -6,7 +6,6 @@ import com.squareup.leakcanary.LeakCanary;
 
 import ru.appcommerce.photoviewer.modules.AppComponent;
 import ru.appcommerce.photoviewer.modules.AppModule;
-import ru.appcommerce.photoviewer.modules.DaggerAppComponent;
 
 public class App extends Application {
     private static AppComponent component;

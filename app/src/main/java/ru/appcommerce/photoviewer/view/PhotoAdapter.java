@@ -34,11 +34,10 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.MyViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        Picasso.get().load(content.get(position).getWebFormatUrl()).into(holder.photoView);
-        holder.photoView.setOnClickListener(v -> {
-            //TODO: Тут отправим position и ссылку на картинку в модель для передачи в DetailPresenter
-            photoClickListener.openPhoto();
-        });
+        if(holder.photoView != null){
+            Picasso.get().load(content.get(position).getWebFormatUrl()).into(holder.photoView);
+            holder.photoView.setOnClickListener(v -> photoClickListener.openPhoto(position, content.get(position).getLargeImageUrl()));
+        }
     }
 
     @Override

@@ -19,6 +19,8 @@ import ru.appcommerce.photoviewer.presenter.DetailPresenter;
 
 public class DetailActivity extends MvpAppCompatActivity implements IDetailPresenter {
     private static final String TAG = "DetailPresenter";
+    public static final String POSITION = "POSITION";
+    public static final String URL_LARGE = "URL";
 
     @InjectPresenter
     public DetailPresenter presenter;
@@ -34,13 +36,30 @@ public class DetailActivity extends MvpAppCompatActivity implements IDetailPrese
         setContentView(R.layout.activity_detail);
         ButterKnife.bind(this);
         initAppBar();
+        if(savedInstanceState == null){
+            start();
+        }
+    }
+
+    private void start(){
+        Intent intent = getIntent();
+        if(intent != null){
+            String urlLarge = intent.getStringExtra(URL_LARGE);
+            int currentPosition = intent.getIntExtra(POSITION, 0);
+            if(urlLarge != null){
+                presenter.setDetailContent(currentPosition, urlLarge);
+                presenter.getDetailContent();
+            }
+        }
     }
 
     private void initAppBar(){
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeButtonEnabled(true);
+        if(toolbar != null){
+            setSupportActionBar(toolbar);
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                getSupportActionBar().setHomeButtonEnabled(true);
+            }
         }
     }
 
@@ -51,7 +70,9 @@ public class DetailActivity extends MvpAppCompatActivity implements IDetailPrese
 
     @Override
     public void showPhoto(String urlContent) {
-        Picasso.get().load(urlContent).into(fullscreen);
+        if(fullscreen != null){
+            Picasso.get().load(urlContent).into(fullscreen);
+        }
     }
 
     @Override

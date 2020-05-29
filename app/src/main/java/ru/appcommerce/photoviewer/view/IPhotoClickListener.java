@@ -1,5 +1,5 @@
 package ru.appcommerce.photoviewer.view;
 
 public interface IPhotoClickListener {
-    void openPhoto();
+    void openPhoto(int position, String urlContent);
 }

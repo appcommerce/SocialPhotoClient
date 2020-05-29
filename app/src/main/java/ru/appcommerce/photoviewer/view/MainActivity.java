@@ -4,7 +4,10 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -35,11 +38,21 @@ public class MainActivity extends MvpAppCompatActivity implements IMainPresenter
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        App.getComponent().inject(this);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
-        if (savedInstanceState == null){
-            presenter.fillPhotoList("marvel", "horizontal", null);
+        ConnectivityManager cm = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null){
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            if (savedInstanceState == null){
+                if(activeNetwork != null){
+                    boolean isLoadFromDB = activeNetwork.isConnectedOrConnecting();
+                    if (!isLoadFromDB) {
+                        presenter.fillPhotoList("marvel", "horizontal", null);
+                    } else {
+                        presenter.getPhotosFromDB();
+                    }
+                }
+            }
         }
     }
 
@@ -55,8 +68,10 @@ public class MainActivity extends MvpAppCompatActivity implements IMainPresenter
     }
 
     @Override
-    public void openPhoto() {
+    public void openPhoto(int position, String urlContent) {
         Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+        intent.putExtra(DetailActivity.POSITION, position);
+        intent.putExtra(DetailActivity.URL_LARGE, urlContent);
         startActivity(intent);
     }
 }
