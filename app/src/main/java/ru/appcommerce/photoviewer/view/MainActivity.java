@@ -4,21 +4,22 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import moxy.MvpAppCompatActivity;
 import moxy.presenter.InjectPresenter;
+import ru.appcommerce.photoviewer.App;
 import ru.appcommerce.photoviewer.R;
+import ru.appcommerce.photoviewer.model.AppPreferences;
 import ru.appcommerce.photoviewer.model.Hit;
 import ru.appcommerce.photoviewer.presenter.MainPresenter;
 
@@ -30,6 +31,8 @@ public class MainActivity extends MvpAppCompatActivity implements IMainPresenter
     @BindView(R.id.progressBar)
     ProgressBar progressBar;
 
+    @Inject
+    AppPreferences appPreferences;
     @InjectPresenter
     MainPresenter presenter;
 
@@ -37,20 +40,18 @@ public class MainActivity extends MvpAppCompatActivity implements IMainPresenter
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        App.getComponent().inject(this);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
-        ConnectivityManager cm = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cm != null){
-            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-            if (savedInstanceState == null){
-                if(activeNetwork != null){
-                    boolean isLoadFromDB = activeNetwork.isConnectedOrConnecting();
-                    if (isLoadFromDB) {
-                        presenter.fillPhotoList("marvel", "horizontal", null);
-                    } else {
-                        presenter.getPhotosFromDB();
-                    }
-                }
+        boolean isLoadFromDB = appPreferences.getIsLoadFromDb();
+        if (!isLoadFromDB) {
+            presenter.fillPhotoList("marvel", "horizontal", null);
+        } else {
+            long updateTimestamp = appPreferences.getUpdateTimestamp();
+            if (presenter.isUpdateNeeded(updateTimestamp)) {
+                presenter.fillPhotoList("marvel", "horizontal", null);
+            } else {
+                presenter.getPhotosFromDB();
             }
         }
     }
@@ -64,6 +65,12 @@ public class MainActivity extends MvpAppCompatActivity implements IMainPresenter
         photoAdapter.setPhotoClickListener(this);
         recyclerView.setAdapter(photoAdapter);
         progressBar.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void saveContent() {
+        appPreferences.saveIsLoadFromDb(true);
+        appPreferences.saveUpdateTimestamp(presenter.getUpdateTimestamp(System.currentTimeMillis()));
     }
 
     @Override
