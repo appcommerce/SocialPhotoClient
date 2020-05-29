@@ -9,6 +9,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import ru.appcommerce.photoviewer.model.AppPreferences;
 import ru.appcommerce.photoviewer.model.database.Database;
 import ru.appcommerce.photoviewer.model.network.Network;
 
@@ -37,5 +38,11 @@ public class AppModule {
     @Provides
     Context provideContext(){
         return application;
+    }
+
+    @Singleton
+    @Provides
+    AppPreferences provideAppReferences(Context context){
+        return new AppPreferences(context);
     }
 }

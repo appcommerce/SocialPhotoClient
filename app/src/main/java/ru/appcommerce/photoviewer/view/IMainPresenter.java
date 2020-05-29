@@ -10,4 +10,6 @@ import ru.appcommerce.photoviewer.model.Hit;
 public interface IMainPresenter extends MvpView {
     @StateStrategyType(value = SkipStrategy.class)
     void loadRecycler(List<Hit> content);
+    @StateStrategyType(value = SkipStrategy.class)
+    void saveContent();
 }

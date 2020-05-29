@@ -21,6 +21,8 @@ import ru.appcommerce.photoviewer.view.IMainPresenter;
 @InjectViewState
 public class MainPresenter extends MvpPresenter<IMainPresenter> {
     private static final String TAG = "MainPresenter";
+    private final long FULL_DAY_MILLIS = 86_400_000;
+
     @Inject
     Network network;
     @Inject
@@ -51,14 +53,14 @@ public class MainPresenter extends MvpPresenter<IMainPresenter> {
     public void getPhotosFromDB() {
         subscriptions.add(iPhotoDao.getAll().subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread()).subscribe(
-                        photos -> getViewState().loadRecycler(photos),
+                        content -> getViewState().loadRecycler(content),
                         throwable -> Log.e(TAG, "onError", throwable)));
     }
 
     private void putPhotosToDB(PhotoArray photoArray) {
         subscriptions.add(iPhotoDao.insertList(photoArray.getHits()).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread()).subscribe(
-                        longs -> Log.d(TAG, "Return id: "+longs),
+                        longs -> getViewState().saveContent(),
                         throwable -> Log.e(TAG, "onError", throwable)));
     }
 
@@ -67,6 +69,18 @@ public class MainPresenter extends MvpPresenter<IMainPresenter> {
                 .observeOn(AndroidSchedulers.mainThread()).subscribe(
                         longs -> Log.e(TAG, "onSuccess, table cleared"),
                         throwable -> Log.e(TAG, "onError", throwable)));
+    }
+
+    public boolean isUpdateNeeded(long updateTimestamp) {
+        if (updateTimestamp == 0) {
+            return true;
+        }
+        long nowTimestamp = System.currentTimeMillis();
+        return nowTimestamp >= updateTimestamp;
+    }
+
+    public long getUpdateTimestamp(long currentTimestamp) {
+        return currentTimestamp + FULL_DAY_MILLIS;
     }
 
     private String prepareQuery(String query) {
